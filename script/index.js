@@ -76,11 +76,13 @@ $filter_inputs.on('change', function () {
 
 
 $search_in.on("keyup", function () {
-    searchin();
+    searchin_debounced();
 });
 
 $('form[role="search"]').on('submit', function (e) {
     e.preventDefault();
+    // Submit should search now, not wait for the debounce that was still pending.
+    searchin_debounced.cancel();
     searchin();
 });
 

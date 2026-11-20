@@ -39,18 +39,26 @@ if (!tmdb.token) {
 function build_url(endpoint, new_params = {}) {
     let url = new URL(configs.baseUrl + endpoint),
         final_params = Object.assign({}, configs.defaults, new_params);
+
     Object.keys(final_params).forEach(key => {
-        url.searchParams.append(key, final_params[key]);
+        let value = final_params[key];
+
+        // Unselected filters arrive as '' and must not be sent at all, and set()
+        // replaces a default instead of appending a second copy of the same key.
+        if (value === undefined || value === null || value === '') {
+            url.searchParams.delete(key);
+            return;
+        }
+
+        url.searchParams.set(key, value);
     });
 
     return url.toString();
 }
 
-async function get_lists(endpoint, params, method) {
+async function get_lists(url, method = 'GET') {
 
-    // url = `https://api.themoviedb.org/3/trending/movie/day?language=arabic`
-    // q, discover, trending, genre/ movie/date,popular,toprated, movieid+recommendation?lang=en&page=1
-    let final_url = build_url(endpoint, params);
+    // Callers build the URL with build_url(), so endpoint + query are settled here.
    $activeRequests++;
 
     if($activeRequests === 1){
@@ -59,7 +67,7 @@ async function get_lists(endpoint, params, method) {
 
     try {
         let response = await $.ajax({
-            url: final_url,
+            url,
             method,
             headers: configs.headers
         });

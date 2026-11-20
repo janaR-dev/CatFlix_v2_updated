@@ -5,8 +5,10 @@ async function popular_show() {
         let $container = $(`.genre.${name} .items`);
 
         let movie_list = await get_lists(
-            configs.endpoints.discover, { sort_by: `popularity.desc`, with_genres: `${genres[name].id}` },
-            'GET'
+            build_url(configs.endpoints.discover, {
+                sort_by: 'popularity.desc',
+                with_genres: genres[name].id
+            })
         );
 
         $container.empty();
@@ -41,10 +43,7 @@ async function trending_show() {
 
     let $container = $(`.mySwiper .swiper-wrapper`);
 
-    let movie_list = await get_lists(
-        configs.endpoints.trending,
-        'GET'
-    );
+    let movie_list = await get_lists(build_url(configs.endpoints.trending));
     $container.empty();
 
     $.each(movie_list.slice(0, 10), function (key, movie) {
@@ -96,10 +95,7 @@ async function top_rated_show() {
 
     let $container = $(`.mySwiper2 .swiper-wrapper`);
 
-    let movie_list = await get_lists(
-        configs.endpoints.topRated,
-        'GET'
-    );
+    let movie_list = await get_lists(build_url(configs.endpoints.topRated));
     $container.empty();
 
     $.each(movie_list.slice(0, 10), function (key, movie) {
@@ -170,7 +166,7 @@ async function filter() {
         include_adult: false
     };
 
-    let movie_list = await get_lists(configs.endpoints.discover, filter_params, 'GET');
+    let movie_list = await get_lists(build_url(configs.endpoints.discover, filter_params));
     $.each(movie_list.slice(0, 24), function (key, movie) {
 
         $('.main-pop').addClass('d-none');
@@ -202,21 +198,30 @@ async function filter() {
 
 }
 
+let search_request_id = 0;
+
 async function searchin() {
     let search = $search_in.val().trim(),
         $container = $('.search-result');
 
     if (search !== "") {
-        let movie_list = await get_lists(configs.endpoints.search, {
+        let request_id = ++search_request_id;
+
+        let movie_list = await get_lists(build_url(configs.endpoints.search, {
             query: search,
             include_adult: false,
             certification_country: "US",
             "certification.lte": `G`
-        }, 'GET');
+        }));
+
+        // A later keystroke has already asked for newer results; drop this response.
+        if (request_id !== search_request_id) {
+            return;
+        }
 
         $('section').addClass('d-none');
         $('.intro').addClass('d-none');
-        $container.removeClass('d-none');
+        $container.empty().removeClass('d-none');
 
         $home_btn.removeClass('active');
 
@@ -248,6 +253,22 @@ async function searchin() {
         back_home();
     }
 }
+
+function debounce(fn, wait) {
+    let timer;
+
+    function debounced(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), wait);
+    }
+
+    debounced.cancel = () => clearTimeout(timer);
+
+    return debounced;
+}
+
+// Typing fires one request per keystroke; wait for a pause instead.
+const searchin_debounced = debounce(searchin, 350);
 
 function back_home() {
     let $container = $('.search-result');
@@ -359,10 +380,7 @@ async function update_fav() {
 
 async function add_ToList(movie_id, $container) {
     let id = Number(movie_id);
-    let movie = await get_lists(
-        configs.endpoints.movieDetails(movie_id),
-        'GET'
-    );
+    let movie = await get_lists(build_url(configs.endpoints.movieDetails(movie_id)));
     console.log(movie);
     if (!movie) {
         console.error(`API Error: No data returned for movie ID: ${movie_id}. Check your endpoint or API key.`);
@@ -395,11 +413,9 @@ async function add_ToList(movie_id, $container) {
 async function movie_details(movieId) {
     let $view = $('.view_movie'),
         movie = await get_lists(
-            configs.endpoints.movieDetails(movieId),
-            {
+            build_url(configs.endpoints.movieDetails(movieId), {
                 append_to_response: 'credits,reviews,videos'
-            },
-            'GET'
+            })
         );
 
     let posterPath = movie.poster_path
