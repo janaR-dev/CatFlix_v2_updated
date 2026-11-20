@@ -1,0 +1,7 @@
+# Local credentials — never commit
+script/config.local.js
+
+# Local debug artifacts
+.cursor/
+debug-server.js
+*.log

@@ -1,8 +1,10 @@
+const tmdb = window.TMDB_CONFIG || {};
+
 const configs = {
     baseUrl: 'https://api.themoviedb.org/3',
     imgBase: 'https://image.tmdb.org/t/p/',
-    accountId: '23070170',
-    session_id: "5dfef6bb693651c316dc9d3410d3e10beae6ec20",
+    accountId: tmdb.accountId || '',
+    session_id: tmdb.sessionId || '',
 
     endpoints: {
         trending: '/trending/movie/day',
@@ -26,9 +28,13 @@ const configs = {
     },
     headers: {
         accept: 'application/json',
-        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlYWQxNzVkYzE5NWEyNDBhMTI4NTUzODlhMTc4YmQyOSIsIm5iZiI6MTc3NzQ4ODcwOC45NTUwMDAyLCJzdWIiOiI2OWYyNTM0NDc2MDc2YzA4MGQ4MjRkNDAiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.LRVlq9a5BITXkDPNWu7TXNSDWLwIEs_yKgT9NqR1h2M'
+        Authorization: `Bearer ${tmdb.token || ''}`
     }
 };
+
+if (!tmdb.token) {
+    console.error('[CatFlix] No TMDB token configured. Copy script/config.example.js to script/config.local.js and paste your TMDB API Read Access Token into it.');
+}
 
 function build_url(endpoint, new_params = {}) {
     let url = new URL(configs.baseUrl + endpoint),
@@ -192,7 +198,7 @@ async function get_movie(movie_id) {
 //             method: 'GET',
 //             headers: {
 //                 accept: 'application/json',
-//                 Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlYWQxNzVkYzE5NWEyNDBhMTI4NTUzODlhMTc4YmQyOSIsIm5iZiI6MTc3NzQ4ODcwOC45NTUwMDAyLCJzdWIiOiI2OWYyNTM0NDc2MDc2YzA4MGQ4MjRkNDAiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.LRVlq9a5BITXkDPNWu7TXNSDWLwIEs_yKgT9NqR1h2M'
+//                 Authorization: `Bearer ${tmdb.token || ''}`
 //             }
 //         });
 
@@ -216,7 +222,7 @@ async function get_movie(movie_id) {
 //             headers: {
 //                 accept: 'application/json',
 //                 'Content-Type': 'application/json',
-//                 Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlYWQxNzVkYzE5NWEyNDBhMTI4NTUzODlhMTc4YmQyOSIsIm5iZiI6MTc3NzQ4ODcwOC45NTUwMDAyLCJzdWIiOiI2OWYyNTM0NDc2MDc2YzA4MGQ4MjRkNDAiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.LRVlq9a5BITXkDPNWu7TXNSDWLwIEs_yKgT9NqR1h2M'
+//                 Authorization: `Bearer ${tmdb.token || ''}`
 //             },
 
 //             data: JSON.stringify({
