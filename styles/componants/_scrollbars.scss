@@ -36,7 +36,9 @@ html,
 body,
 .login-popup .container,
 .view_movie,
-.view_movie .reviews {
+.view_movie .reviews,
+.watchlist .container,
+.favourits .container {
     scrollbar-width: auto;
 }
 
@@ -86,7 +88,9 @@ body,
     .view_movie,
     .view_movie .reviews,
     .view_movie .casting .cards,
+    .watchlist,
     .watchlist .container,
+    .favourits,
     .favourits .container,
     textarea {
         scrollbar-width: thin;
