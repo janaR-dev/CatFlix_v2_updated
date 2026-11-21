@@ -53,7 +53,7 @@ let images_params = {
             "id": 16,
             "name": "Animation"
         },
-        Comdey: {
+        Comedy: {
             "id": 35,
             "name": "Komödie"
         },

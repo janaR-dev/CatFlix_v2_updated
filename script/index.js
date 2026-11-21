@@ -22,6 +22,14 @@ $tooltipTriggerList.map(el =>
     new bootstrap.Tooltip(el)
 );
 
+// A genre checkbox whose id has no entry in the genres map silently filters
+// nothing, so warn about it instead of failing quietly.
+$('#nav-genre input').each(function () {
+    if (!genres[this.id]) {
+        console.warn(`[CatFlix] Genre filter "${this.id}" has no entry in genres.`);
+    }
+});
+
 
 update_theme()
 init_user();

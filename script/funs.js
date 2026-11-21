@@ -1,5 +1,5 @@
 async function popular_show() {
-    let genresToShow = ['Action', 'Family', 'Comdey', 'Animation'];
+    let genresToShow = ['Action', 'Family', 'Comedy', 'Animation'];
 
     for (let name of genresToShow) {
         let $container = $(`.genre.${name} .items`);
@@ -196,7 +196,9 @@ async function filter() {
     update_watchlist();
     update_fav();
 
-
+    if (movie_list.length === 0) {
+        $container.append('<p class="col-12 text-center my-4">No movies match these filters. Try widening them, or check your connection.</p>');
+    }
 }
 
 let search_request_id = 0;
@@ -251,6 +253,10 @@ async function searchin() {
 
         update_watchlist();
         update_fav();
+
+        if (movie_list.length === 0) {
+            $container.append('<p class="col-12 text-center my-4">No movies found. Try a different search, or check your connection.</p>');
+        }
     } else {
         back_home();
     }
