@@ -5,7 +5,13 @@ let $filter_inputs = $('#nav-genre input, #nav-Language input, #nav-age input'),
     $home_btn = $('.nav-link[href="#"]:contains("Home")'),
     $list = $(`.movie_list`),
     $loadingModal_ele = $('#loadingModal'),
-    $loadingModal = new bootstrap.Modal($loadingModal_ele),
+    // A plain overlay, not a Bootstrap modal: opening a modal locks body
+    // scrolling and adds scrollbar padding, which shifted the page on every
+    // request. This only toggles visibility, so the layout never moves.
+    $loadingModal = {
+        show: () => $loadingModal_ele.addClass('active'),
+        hide: () => $loadingModal_ele.removeClass('active')
+    },
     $activeRequests = 0,
     $tooltipTriggerList =
         [].slice.call(

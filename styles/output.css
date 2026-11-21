@@ -13255,6 +13255,23 @@ header .swiper .swiper-slide .swipe-body a:hover {
   color: rgb(156, 90, 148);
 }
 
+#loadingModal {
+  position: fixed;
+  inset: 0;
+  z-index: 1060;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.35);
+}
+#loadingModal.active {
+  display: flex;
+}
+#loadingModal .modal-content {
+  width: 100%;
+  max-width: 480px;
+}
 #loadingModal .modal-content {
   background-color: #F294B6;
   border: none;

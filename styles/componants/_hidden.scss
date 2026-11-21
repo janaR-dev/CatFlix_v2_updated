@@ -558,6 +558,26 @@
 }
 
 #loadingModal {
+    position: fixed;
+    inset: 0;
+    z-index: 1060;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background-color: rgba(0, 0, 0, 0.35);
+
+    &.active {
+        display: flex;
+    }
+
+    .modal-content {
+        width: 100%;
+        max-width: 480px;
+    }
+}
+
+#loadingModal {
     .modal-content {
         background-color: $main-light;
         border: none;
