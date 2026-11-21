@@ -2,7 +2,9 @@
 
 body.dark{
   background-color: $main-dark;
-  transition-property: all;
+  /* Only the theme change fades. "all" also animated padding/width, so any
+     scrollbar compensation (popups, loaders) made the whole page wobble. */
+  transition-property: background-color, color;
   transition-duration: .5s;
     color: $font-dark;
  

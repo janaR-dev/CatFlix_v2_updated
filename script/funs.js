@@ -4,12 +4,12 @@ async function popular_show() {
     for (let name of genresToShow) {
         let $container = $(`.genre.${name} .items`);
 
-        let movie_list = await get_lists(
+        let movie_list = await with_loader(() => get_lists(
             build_url(configs.endpoints.discover, {
                 sort_by: 'popularity.desc',
                 with_genres: genres[name].id
             })
-        );
+        ));
 
         $container.empty();
 
@@ -43,7 +43,7 @@ async function trending_show() {
 
     let $container = $(`.mySwiper .swiper-wrapper`);
 
-    let movie_list = await get_lists(build_url(configs.endpoints.trending));
+    let movie_list = await with_loader(() => get_lists(build_url(configs.endpoints.trending)));
     $container.empty();
 
     $.each(movie_list.slice(0, 10), function (key, movie) {
@@ -95,7 +95,7 @@ async function top_rated_show() {
 
     let $container = $(`.mySwiper2 .swiper-wrapper`);
 
-    let movie_list = await get_lists(build_url(configs.endpoints.topRated));
+    let movie_list = await with_loader(() => get_lists(build_url(configs.endpoints.topRated)));
     $container.empty();
 
     $.each(movie_list.slice(0, 10), function (key, movie) {
@@ -197,7 +197,7 @@ async function filter() {
     update_fav();
 
     if (movie_list.length === 0) {
-        $container.append('<p class="col-12 text-center my-4">No movies match these filters. Try widening them, or check your connection.</p>');
+        no_results($container, 'No movies match these filters. Try widening them, or check your connection.');
     }
 }
 
@@ -255,7 +255,7 @@ async function searchin() {
         update_fav();
 
         if (movie_list.length === 0) {
-            $container.append('<p class="col-12 text-center my-4">No movies found. Try a different search, or check your connection.</p>');
+            no_results($container, 'No movies found. Try a different search, or check your connection.');
         }
     } else {
         back_home();
@@ -286,6 +286,10 @@ function back_home() {
     $('#Recomendations').addClass('d-none');
     $('.intro').removeClass('d-none');
     $home_btn.addClass('active');
+}
+
+function no_results($container, message) {
+    $container.append(`<p class="col-12 text-center my-4">${message}</p>`);
 }
 
 
@@ -420,11 +424,11 @@ async function add_ToList(movie_id, $container) {
 
 async function movie_details(movieId) {
     let $view = $('.view_movie'),
-        movie = await get_lists(
+        movie = await with_loader(() => get_lists(
             build_url(configs.endpoints.movieDetails(movieId), {
                 append_to_response: 'credits,reviews,videos'
             })
-        );
+        ));
 
     let posterPath = movie.poster_path
         ? `${configs.imgBase}w500${movie.poster_path}`

@@ -7,12 +7,32 @@ let $filter_inputs = $('#nav-genre input, #nav-Language input, #nav-age input'),
     $loadingModal_ele = $('#loadingModal'),
     // A plain overlay, not a Bootstrap modal: opening a modal locks body
     // scrolling and adds scrollbar padding, which shifted the page on every
-    // request. This only toggles visibility, so the layout never moves.
-    $loadingModal = {
-        show: () => $loadingModal_ele.addClass('active'),
-        hide: () => $loadingModal_ele.removeClass('active')
-    },
-    $activeRequests = 0,
+    // request. This only toggles visibility (fixed, above every other layer),
+    // so the layout never moves. It also keeps a 5 second minimum display time,
+    // so a burst of requests shows one spinner instead of a backdrop that
+    // flashes on and off.
+    $loadingModal = (() => {
+        const LOADING_MIN_MS = 5000;
+
+        let shown_at = 0,
+            hide_timer = null;
+
+        return {
+            show() {
+                clearTimeout(hide_timer);
+                shown_at = Date.now();
+                $loadingModal_ele.addClass('active');
+            },
+            hide() {
+                const remaining = LOADING_MIN_MS - (Date.now() - shown_at);
+
+                clearTimeout(hide_timer);
+                hide_timer = setTimeout(() => {
+                    $loadingModal_ele.removeClass('active');
+                }, Math.max(0, remaining));
+            }
+        };
+    })(),
     $tooltipTriggerList =
         [].slice.call(
             $('[title]')
@@ -22,14 +42,10 @@ $tooltipTriggerList.map(el =>
     new bootstrap.Tooltip(el)
 );
 
-// A genre checkbox whose id has no entry in the genres map silently filters
-// nothing, so warn about it instead of failing quietly.
+// A genre checkbox without a map entry filters nothing, so say so.
 $('#nav-genre input').each(function () {
-    if (!genres[this.id]) {
-        console.warn(`[CatFlix] Genre filter "${this.id}" has no entry in genres.`);
-    }
+    if (!genres[this.id]) console.warn('[CatFlix] Genre filter has no entry in genres:', this.id);
 });
-
 
 update_theme()
 init_user();
@@ -230,6 +246,28 @@ $(document).on(
         load_Reviews(movieId);
     }
 );
+
+// Icon links on this page are <a href="#"> placeholders (filter icon, theme switch,
+// logo). Clicking one navigates to the "#" fragment, and because the page has
+// scroll-behavior: smooth that scrolls the whole document back to the top - the
+// jump that reads as the page shaking on every icon click. Nothing here needs a
+// fragment, so stop the navigation for all hash-only links.
+document.addEventListener('click', function (e) {
+    const link = e.target.closest && e.target.closest('a[href="#"]');
+
+    if (!link) return;
+
+    e.preventDefault();
+
+    // Cancelling the anchor's click also cancels the theme label's activation,
+    // so flip the checkbox here and let the change handler below apply it.
+    if (link.querySelector('#mode')) {
+        const mode = document.getElementById('mode');
+
+        mode.checked = !mode.checked;
+        $(mode).trigger('change');
+    }
+}, true);
 
 $('#mode').on('change', function () {
 

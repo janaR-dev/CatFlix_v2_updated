@@ -9,12 +9,20 @@
 
 html {
     scroll-behavior: smooth;
+    /* The page height changes while data loads/renders. Without a reserved
+       gutter the vertical scrollbar appears and disappears, which makes the
+       whole document 17px wider/narrower every time - the page jumps. */
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
 }
 
 body {
 
     scrollbar-width: none;
-    transition-duration: .5s;
+    /* Was transition-duration: .5s, which animates every body property
+       (including the padding popups add back for the scrollbar), so those
+       resizes played out as a wobble. Only the theme change should fade. */
+    transition: background-color .5s, color .5s;
     position: relative;
     font-family: $main-font;
     padding: 0;

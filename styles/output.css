@@ -12088,11 +12088,19 @@ textarea.form-control-lg {
 
 html {
   scroll-behavior: smooth;
+  /* The page height changes while data loads/renders. Without a reserved
+     gutter the vertical scrollbar appears and disappears, which makes the
+     whole document 17px wider/narrower every time - the page jumps. */
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
 }
 
 body {
   scrollbar-width: none;
-  transition-duration: 0.5s;
+  /* Was transition-duration: 0.5s, which animates every body property
+     (including the padding popups add back for the scrollbar), so those
+     resizes played out as a wobble. Only the theme change should fade. */
+  transition: background-color 0.5s, color 0.5s;
   position: relative;
   font-family: "Agbalumo", system-ui;
   padding: 0;
@@ -13256,14 +13264,17 @@ header .swiper .swiper-slide .swipe-body a:hover {
 }
 
 #loadingModal {
+  /* Fixed to the viewport so it never takes part in the page layout, above
+     every other layer, and clicks pass straight through to the page. */
   position: fixed;
   inset: 0;
-  z-index: 1060;
+  z-index: 3000;
   display: none;
   align-items: center;
   justify-content: center;
   padding: 16px;
   background-color: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
 }
 #loadingModal.active {
   display: flex;
@@ -13343,7 +13354,9 @@ header .swiper .swiper-slide .swipe-body a:hover {
 
 body.dark {
   background-color: #010221;
-  transition-property: all;
+  /* Only the theme change fades. "all" also animated padding/width, so any
+     scrollbar compensation (popups, loaders) made the whole page wobble. */
+  transition-property: background-color, color;
   transition-duration: 0.5s;
   color: #FACFCE;
 }

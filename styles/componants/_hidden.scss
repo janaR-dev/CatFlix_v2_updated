@@ -558,14 +558,17 @@
 }
 
 #loadingModal {
+    /* Fixed to the viewport so it never takes part in the page layout, above
+       every other layer, and clicks pass straight through to the page. */
     position: fixed;
     inset: 0;
-    z-index: 1060;
+    z-index: 3000;
     display: none;
     align-items: center;
     justify-content: center;
     padding: 16px;
     background-color: rgba(0, 0, 0, 0.35);
+    pointer-events: none;
 
     &.active {
         display: flex;

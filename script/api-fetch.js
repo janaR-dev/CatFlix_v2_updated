@@ -56,14 +56,22 @@ function build_url(endpoint, new_params = {}) {
     return url.toString();
 }
 
+// The request layer knows nothing about the loading overlay: fav/watchlist
+// toggles fetch one movie per card and should never cover the page, so only the
+// page-level movie loads call with_loader(). The overlay keeps a 5s minimum
+// display time, so a burst of requests cannot make it blink.
+async function with_loader(task) {
+    $loadingModal.show();
+
+    try {
+        return await task();
+
+    } finally {
+        $loadingModal.hide();
+    }
+}
+
 async function get_lists(url, method = 'GET') {
-
-    // Callers build the URL with build_url(), so endpoint + query are settled here.
-   $activeRequests++;
-
-    if($activeRequests === 1){
-       $loadingModal.show();
- }
 
     try {
         let response = await $.ajax({
@@ -79,19 +87,7 @@ async function get_lists(url, method = 'GET') {
         // Callers render straight from the result, so a failed request returns an
         // empty list instead of undefined and the section just stays empty.
         return [];
-
-    }finally {
-
-        $activeRequests--;
-
-        if($activeRequests === 0){
-
-            setTimeout(() => {
-                $loadingModal.hide();
-            }, 500);}
-
-}
-
+    }
 }
 
 
