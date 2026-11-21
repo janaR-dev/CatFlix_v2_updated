@@ -33,7 +33,7 @@ const configs = {
 };
 
 if (!tmdb.token) {
-    console.error('[CatFlix] No TMDB token configured. Copy script/config.example.js to script/config.local.js and paste your TMDB API Read Access Token into it.');
+    console.error('[CatFlix] No TMDB token configured. Put your TMDB API Read Access Token in script/config.example.js, which index.html loads.');
 }
 
 function build_url(endpoint, new_params = {}) {
