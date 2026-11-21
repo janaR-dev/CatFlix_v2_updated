@@ -156,7 +156,7 @@ async function filter() {
     $age_certifi.each(function () {
         selected_age = $(this).val();
     });
-    if (selected_age.length == '') {
+    if (!selected_age) {
         selected_age = 'G'
     }
     let filter_params = {
@@ -191,9 +191,10 @@ async function filter() {
                 </div>`;
 
         $container.append(card);
-        update_watchlist();
-        update_fav();
     });
+
+    update_watchlist();
+    update_fav();
 
 
 }
@@ -246,9 +247,10 @@ async function searchin() {
                     </div>
                 </div>`;
             $container.append(card);
-            update_watchlist();
-            update_fav();
         });
+
+        update_watchlist();
+        update_fav();
     } else {
         back_home();
     }
@@ -382,7 +384,7 @@ async function add_ToList(movie_id, $container) {
     let id = Number(movie_id);
     let movie = await get_lists(build_url(configs.endpoints.movieDetails(movie_id)));
     console.log(movie);
-    if (!movie) {
+    if (!movie || !movie.id) {
         console.error(`API Error: No data returned for movie ID: ${movie_id}. Check your endpoint or API key.`);
         return;
     }

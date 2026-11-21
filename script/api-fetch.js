@@ -76,6 +76,9 @@ async function get_lists(url, method = 'GET') {
 
     } catch (err) {
         console.error("Fetch error:", err);
+        // Callers render straight from the result, so a failed request returns an
+        // empty list instead of undefined and the section just stays empty.
+        return [];
 
     }finally {
 
